@@ -36,4 +36,24 @@ describe("Test1", () => {
       expect(await test1.getNumber()).to.equal(3);
     });
   });
+
+  describe("Revert", () => {
+    it("Revert Test", async () => {
+      const revertTestTx = test1.revertTest();
+
+      await expect(revertTestTx).to.revertedWithCustomError(
+        test1,
+        "RevertTest"
+      );
+    });
+
+    it("Revert Test Yul", async () => {
+      const revertTestYulTx = test1.revertTestYul();
+
+      await expect(revertTestYulTx).to.revertedWithCustomError(
+        test1,
+        "RevertTest"
+      );
+    });
+  });
 });

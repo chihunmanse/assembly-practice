@@ -5,6 +5,8 @@ contract Test1 {
     uint256 private number = 5;
     mapping(address => uint256) public mappingNumbers;
 
+    error RevertTest();
+
     bytes32 public hashWord;
 
     function getNumber() external view returns(uint256) {
@@ -33,6 +35,19 @@ contract Test1 {
             
             sstore(slot, _number) 
         } 
+    }
+
+    function revertTest() external {
+        revert RevertTest();
+    }
+
+    function revertTestYul() external {
+        bytes4 errorSelector = RevertTest.selector;
+
+        assembly {
+            mstore(0x00, errorSelector)
+            revert(0x00, 0x04)
+        }
     }
     
 }
