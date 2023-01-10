@@ -16,12 +16,24 @@ describe("Test1", () => {
     await test1.deployed();
   });
 
-  describe("Get", () => {
+  describe("Number", () => {
     it("Get Number", async () => {
       const number = await test1.getNumber();
       const numberYul = await test1.getNumberYul();
 
       expect(number).to.equal(numberYul);
+    });
+
+    it("Set Number", async () => {
+      const setNumberTx = await test1.setNumber(2);
+      await setNumberTx.wait();
+
+      expect(await test1.getNumber()).to.equal(2);
+
+      const setNumberYulTx = await test1.setNumberYul(3);
+      await setNumberYulTx.wait();
+
+      expect(await test1.getNumber()).to.equal(3);
     });
   });
 });

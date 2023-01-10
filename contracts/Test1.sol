@@ -22,5 +22,17 @@ contract Test1 {
             return(ptr, 0x20)
         }
     }
+
+    function setNumber(uint256 _number) external {
+        number = _number;
+    }
+
+    function setNumberYul(uint _number) external { 
+        assembly { 
+            let slot := number.slot 
+            
+            sstore(slot, _number) 
+        } 
+    }
     
 }
