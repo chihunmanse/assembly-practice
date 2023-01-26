@@ -6,8 +6,20 @@ contract GetterAndSetter {
     uint256[] private array = [1, 2, 3];
     mapping(address => uint256) private numberByAddress;
 
+    struct Struct {
+        uint256 num1;
+        uint256 num2;
+        uint128 num3;
+        uint128 num4;
+    }
+
+    Struct private numStruct = Struct(1, 2, 3, 4);
+
+    mapping(uint256 => Struct) private structByNumber;
+
     constructor() {
         numberByAddress[msg.sender] = 100;
+        structByNumber[5] = Struct(6, 7, 8, 9);
     }
 
     /*
@@ -51,6 +63,40 @@ contract GetterAndSetter {
         }
     }
 
+    function getStruct()
+        external
+        view
+        returns (uint256 num1, uint256 num2, uint128 num3, uint128 num4)
+    {
+        assembly {
+            let num34 := sload(add(numStruct.slot, 2))
+
+            num1 := sload(numStruct.slot)
+            num2 := sload(add(numStruct.slot, 1))
+            num3 := and(num34, 0xffffffffffffffffffffffffffffffff)
+            num4 := shr(128, num34)
+        }
+    }
+
+    function getStructMapping(
+        uint256 _index
+    )
+        external
+        view
+        returns (uint256 num1, uint256 num2, uint128 num3, uint128 num4)
+    {
+        Struct storage _numStruct = structByNumber[_index];
+
+        assembly {
+            num1 := sload(_numStruct.slot)
+            num2 := sload(add(_numStruct.slot, 1))
+
+            let w := sload(add(_numStruct.slot, 2))
+            num3 := and(w, 0xffffffffffffffffffffffffffffffff)
+            num4 := shr(128, w)
+        }
+    }
+
     /*
      *  Setter
      */
@@ -84,6 +130,63 @@ contract GetterAndSetter {
             let slot := keccak256(0x40, 64)
 
             sstore(slot, _value)
+        }
+    }
+
+    function setStruct(
+        uint256 _num1,
+        uint256 _num2,
+        uint128 _num3,
+        uint128 _num4
+    ) external {
+        assembly {
+            sstore(numStruct.slot, _num1)
+            sstore(add(numStruct.slot, 1), _num2)
+
+            let num34 := sload(add(numStruct.slot, 2))
+
+            num34 := and(num34, not(0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF))
+            num34 := or(num34, and(_num3, 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF))
+
+            num34 := and(num34, 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
+            num34 := or(
+                num34,
+                shl(128, and(_num4, 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF))
+            )
+
+            sstore(add(numStruct.slot, 2), num34)
+        }
+    }
+
+    function setStructMapping(
+        uint256 _index,
+        uint256 _num1,
+        uint256 _num2,
+        uint128 _num3,
+        uint128 _num4
+    ) external {
+        assembly {
+            mstore(0x40, _index)
+
+            mstore(add(0x40, 32), structByNumber.slot)
+
+            let slot := keccak256(0x40, 64)
+
+            sstore(slot, _num1)
+            sstore(add(slot, 1), _num2)
+
+            let num34 := sload(add(slot, 2))
+
+            num34 := and(num34, not(0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF))
+            num34 := or(num34, and(_num3, 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF))
+
+            num34 := and(num34, 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF)
+            num34 := or(
+                num34,
+                shl(128, and(_num4, 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF))
+            )
+
+            sstore(add(slot, 2), num34)
         }
     }
 }

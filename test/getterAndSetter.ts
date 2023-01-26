@@ -30,9 +30,27 @@ describe("GetterAndSetter", () => {
 
       expect(value).to.equal(100);
     });
+
+    it("Get Struct", async () => {
+      const struct = await getterAndSetter.getStruct();
+
+      expect(struct.num1).to.equal(1);
+      expect(struct.num2).to.equal(2);
+      expect(struct.num3).to.equal(3);
+      expect(struct.num4).to.equal(4);
+    });
+
+    it("Get Struct Mapping", async () => {
+      const struct = await getterAndSetter.getStructMapping(5);
+
+      expect(struct.num1).to.equal(6);
+      expect(struct.num2).to.equal(7);
+      expect(struct.num3).to.equal(8);
+      expect(struct.num4).to.equal(9);
+    });
   });
 
-  describe("Getter", () => {
+  describe("Setter", () => {
     it("Set Number", async () => {
       const setTx = await getterAndSetter.setNumber(10);
       await setTx.wait();
@@ -61,6 +79,28 @@ describe("GetterAndSetter", () => {
 
       const value = await getterAndSetter.getMappingValue();
       expect(value).to.equal(200);
+    });
+
+    it("Set Struct", async () => {
+      const setTx = await getterAndSetter.setStruct(3, 4, 5, 6);
+      await setTx.wait();
+
+      const struct = await getterAndSetter.getStruct();
+      expect(struct.num1).to.equal(3);
+      expect(struct.num2).to.equal(4);
+      expect(struct.num3).to.equal(5);
+      expect(struct.num4).to.equal(6);
+    });
+
+    it("Set Struct Mapping", async () => {
+      const setTx = await getterAndSetter.setStructMapping(5, 3, 4, 5, 6);
+      await setTx.wait();
+
+      const struct = await getterAndSetter.getStructMapping(5);
+      expect(struct.num1).to.equal(3);
+      expect(struct.num2).to.equal(4);
+      expect(struct.num3).to.equal(5);
+      expect(struct.num4).to.equal(6);
     });
   });
 });
